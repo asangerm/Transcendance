@@ -1,2 +1,2 @@
 # Transcendance
-Transcendance groupe project from 42 school.
+Transcendance group project from 42 school.

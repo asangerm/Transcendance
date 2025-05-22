@@ -32,7 +32,7 @@ Créer un jeu de ping-pong en ligne avec matchmaking, chat en temps réel, syst�
 
 ## 📊 Gestion des modules
 
-    📊 [Voir le tableau Google Sheets](https://docs.google.com/spreadsheets/d/14Mzw_ATNZ2kGa5tiQ0BoNGbKqMgrd8GDxE_yPBFLGqM/edit?usp=sharing)
+📊 [Voir le tableau Google Sheets](https://docs.google.com/spreadsheets/d/14Mzw_ATNZ2kGa5tiQ0BoNGbKqMgrd8GDxE_yPBFLGqM/edit?usp=sharing)
 
 ## 🔧 Installation (dev)
 

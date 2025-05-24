@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  frontend:
+    container_name: transcendence-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app:delegated
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
+
+  backend:
+    container_name: transcendence-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - sqlite_data:/app/data
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=file:/app/data/db.sqlite
+
+volumes:
+  sqlite_data: 

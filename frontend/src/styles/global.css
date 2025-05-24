@@ -1,0 +1,13 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom global styles */
+body {
+  @apply bg-gray-100 min-h-screen;
+}
+
+/* Force Tailwind classes to be included in build */
+.force-tailwind {
+  @apply bg-white text-black p-4 m-4 rounded-lg shadow-md;
+} 

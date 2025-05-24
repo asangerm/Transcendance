@@ -1,72 +1,57 @@
-# 🕹️ Transcendance
+# ft_transcendence
 
-> Projet de développement d’un jeu multijoueur en ligne, réalisé dans le cadre de l’École 42.
+A real-time multiplayer Pong game web application.
 
-## 📌 Objectif
+## Prerequisites
 
-Créer un jeu de ping-pong en ligne avec matchmaking, chat en temps réel, système de classement, gestion de comptes utilisateurs et un backend sécurisé.
+- Docker
+- Docker Compose
 
-## 🚀 Fonctionnalités
+## Getting Started
 
-- 🎮 Jeu en ligne 1v1
-- 🧑‍🤝‍🧑 Système de login OAuth
-- 🧵 Chat global et privé
-- 🏆 Classement des joueurs
-- 🛡️ Sécurité JWT & 2FA
-- ⚙️ CI/CD via GitHub Actions
-
-## 🧱 Stack technique
-
-| Frontend | Backend  | Infra/CI         |
-|----------|----------|------------------|
-| React    | NestJS   | Docker           |
-| Tailwind | TypeORM  | GitHub Actions   |
-| WebSocket| PostgreSQL |                 |
-
-## 📂 Structure du projet
-
-    /client      → frontend React
-    /server      → backend NestJS
-    /shared      → types, config communs
-    /docs        → documentation technique
-
-## 📊 Gestion des modules
-
-📊 [Voir le tableau Google Sheets](https://docs.google.com/spreadsheets/d/14Mzw_ATNZ2kGa5tiQ0BoNGbKqMgrd8GDxE_yPBFLGqM/edit?usp=sharing)
-
-## 🔧 Installation (dev)
-
+1. Clone the repository:
 ```bash
-# Clone le repo
-git clone https://github.com/votre-repo/transcendance.git
-cd transcendence
-
-# Lance Docker
-docker compose up --build
+git clone <repository-url>
+cd ft_transcendence
 ```
 
-### Accès :
-- Frontend : http://localhost:3000  
-- Backend : http://localhost:4000
+2. Start the development environment:
+```bash
+docker-compose up --build
+```
 
-## 📸 Captures d'écran
+This will start:
+- Frontend at http://localhost:3000
+- Backend at http://localhost:8000
+- SQLite database stored in a persistent volume
 
-_Ajoutez ici quelques captures du jeu (login, match, scoreboard...)._
+## Project Structure
 
-## 🙌 Contributeurs
+```
+ft_transcendence/
+├── frontend/           # React + TypeScript + Tailwind CSS frontend
+├── backend/           # Fastify backend
+├── docker-compose.yml # Docker compose configuration
+└── README.md         # This file
+```
 
-- @pseudo1 (frontend)
-- @pseudo2 (backend)
-- @pseudo3 (infra/devops)
-- @pseudo4 (UI/UX)
-- @pseudo5 (testing)
+## Development
 
----
+- The frontend and backend directories are mounted as volumes, so any changes will trigger hot-reload
+- The SQLite database file is persisted in a Docker volume
 
-## 🤝 Contribution
+## Security Features
 
-Voir [`CONTRIBUTING.md`](./CONTRIBUTING.md) pour les bonnes pratiques, les conventions de nommage et le workflow Git.
+- HTTPS enabled for all connections
+- Password hashing
+- SQL injection protection
+- XSS attack protection
+- Form validation
+- Protected API routes
 
-## 📄 Licence
+## Technologies
 
-Ce projet est sous licence MIT.
+- Frontend: TypeScript, React, Tailwind CSS
+- Backend: Node.js, Fastify
+- Database: SQLite
+- Container: Docker 

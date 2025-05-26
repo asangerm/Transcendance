@@ -10,6 +10,7 @@ export class Renderer {
     private positionLocation: number;
     private scene: Scene;
     private initialized: boolean = false;
+    private cameraPositionElement: HTMLDivElement;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -22,6 +23,18 @@ export class Renderer {
         this.vertexBuffer = null;
         this.positionLocation = -1;
         this.scene = new Scene();
+        
+        // Create camera position display element
+        this.cameraPositionElement = document.createElement('div');
+        this.cameraPositionElement.style.position = 'absolute';
+        this.cameraPositionElement.style.top = '10px';
+        this.cameraPositionElement.style.left = '10px';
+        this.cameraPositionElement.style.color = 'red';
+        this.cameraPositionElement.style.fontFamily = 'monospace';
+        this.cameraPositionElement.style.fontSize = '14px';
+        this.cameraPositionElement.style.zIndex = '1000';
+        document.body.appendChild(this.cameraPositionElement);
+        
         this.setupCanvas();
     }
 
@@ -108,6 +121,8 @@ export class Renderer {
             gl.uniform1f(gl.getUniformLocation(this.program!, `uObjectTransparencies[${i}]`), obj.material.transparency);
             gl.uniform1f(gl.getUniformLocation(this.program!, `uObjectReflectivities[${i}]`), obj.material.reflectivity);
             gl.uniform1f(gl.getUniformLocation(this.program!, `uObjectRefractiveIndices[${i}]`), obj.material.refractiveIndex);
+            gl.uniform3fv(gl.getUniformLocation(this.program!, `uLightColors[${i}]`), obj.lighting.color);
+            gl.uniform1f(gl.getUniformLocation(this.program!, `uLightIntensities[${i}]`), obj.lighting.intensity);
         });
 
         // Update render settings
@@ -134,5 +149,9 @@ export class Renderer {
         gl.enableVertexAttribArray(this.positionLocation);
         gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, 0, 0);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+        // Update camera position display
+        const pos = scene.camera.position;
+        this.cameraPositionElement.textContent = `Camera: (${pos[0].toFixed(2)}, ${pos[1].toFixed(2)}, ${pos[2].toFixed(2)})`;
     }
 } 

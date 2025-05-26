@@ -4,14 +4,14 @@ export class Camera {
     fov: number;
     aspect: number;
 
-    constructor(position: [number, number, number] = [0, 2, 5], rotation: [number, number, number] = [0, 0, 0], fov = 90, aspect = 1) {
+    constructor(position: [number, number, number] = [0, -7.88, 5], rotation: [number, number, number] = [0, 0, 0], fov = 90, aspect = 1) {
         this.position = position;
         this.rotation = rotation;
         this.fov = fov;
         this.aspect = aspect;
     }
 
-    update(keys: { [key: string]: boolean }, moveSpeed = 0.1, rotateSpeed = 0.02): void {
+    update(keys: { [key: string]: boolean }, moveSpeed = 0.01, rotateSpeed = 0.02): void {
         const forward = [
             -Math.cos(this.rotation[1] + Math.PI/2),   // yaw
             0,

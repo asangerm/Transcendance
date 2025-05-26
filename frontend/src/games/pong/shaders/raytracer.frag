@@ -4,6 +4,11 @@ precision highp float;
 // Golf Ball Ray Intersection GLSL Shader Functions
 // For use in fragment shaders or compute shaders
 
+#define SAMPLE_POINTS 4
+#define MAX_LIGHT_RAYS 64 * SAMPLE_POINTS
+
+#define GI_ENABLED false
+
 uniform vec3 uCameraPosition;
 uniform vec2 uScreenSize;
 uniform mat3 uCameraRotation;
@@ -29,13 +34,9 @@ struct IntersectionResult {
     bool hit;
     float distance;
     vec3 point;
-    vec3 color;
     vec3 normal;
     bool isEntry;
-    float reflectivity;
-    float roughness;
-    float transparency;
-    float refractiveIndex;
+    int objectIndex;
 };
 
 // Simple sphere surface equation
@@ -90,11 +91,7 @@ IntersectionResult intersectShape(vec3 rayOrigin, vec3 rayDirection, int objectI
     result.distance = -1.0;
     result.point = vec3(0.0);
     result.normal = vec3(0.0);
-    result.color = uObjectColors[objectIndex];
-    result.reflectivity = uObjectReflectivities[objectIndex];
-    result.roughness = uObjectRoughnesses[objectIndex];
-    result.transparency = uObjectTransparencies[objectIndex];
-    result.refractiveIndex = uObjectRefractiveIndices[objectIndex];
+    result.objectIndex = objectIndex;
     result.isEntry = false;
     
     vec3 center = uObjectPositions[objectIndex];
@@ -102,7 +99,7 @@ IntersectionResult intersectShape(vec3 rayOrigin, vec3 rayDirection, int objectI
     
     // Transform ray to object space
     mat3 rotationMatrix = createRotationMatrix(uObjectRotations[objectIndex]);
-    mat3 invRotationMatrix = transpose(rotationMatrix); // Inverse of rotation matrix is its transpose
+    mat3 invRotationMatrix = transpose(rotationMatrix);
     
     vec3 localRayOrigin = invRotationMatrix * (rayOrigin - center);
     vec3 localRayDir = invRotationMatrix * rayDirection;
@@ -122,11 +119,11 @@ IntersectionResult intersectShape(vec3 rayOrigin, vec3 rayDirection, int objectI
     float t1 = (-b - sqrtDiscriminant) / (2.0 * a);
     float t2 = (-b + sqrtDiscriminant) / (2.0 * a);
     
-    float startT = (t1 > 0.0) ? max(t1 - 0.02, 0.0) : t2 - 0.02;
-    if (startT < 0.0) return result;
+    // Accept both front and back face intersections
+    float t = (t1 > 0.0) ? t1 : t2;
+    if (t < 0.0) return result;
     
     // Raymarch to find precise intersection
-    float t = startT;
     const int maxSteps = 64;
     const float minDist = 0.0001;
     
@@ -139,11 +136,16 @@ IntersectionResult intersectShape(vec3 rayOrigin, vec3 rayDirection, int objectI
             vec3 worldPoint = rotationMatrix * currentPos + center;
             vec3 worldNormal = normalize(rotationMatrix * calculateNormal(currentPos, radius));
             
+            // Ensure normal points against the ray direction
+            if (dot(rayDirection, worldNormal) > 0.0) {
+                worldNormal = -worldNormal;
+            }
+            
             result.hit = true;
             result.distance = t;
             result.point = worldPoint;
             result.normal = worldNormal;
-            result.isEntry = true;
+            result.isEntry = dot(rayDirection, worldNormal) < 0.0;
             return result;
         }
         
@@ -162,68 +164,13 @@ vec3 getSkyColor(vec3 rayDirection) {
     return mix(vec3(0.0, 0.0, 0.1), vec3(0.2, 0.2, 0.8), t);
 }
 
-IntersectionResult intersectPlane(vec3 rayOrigin, vec3 rayDirection, int objectIndex) {
-    IntersectionResult result;
-    result.hit = false;
-    result.distance = -1.0;
-    result.point = vec3(0.0);
-    result.normal = vec3(0.0);
-    result.color = uObjectColors[objectIndex];
-    result.reflectivity = uObjectReflectivities[objectIndex];
-    result.roughness = uObjectRoughnesses[objectIndex];
-    result.transparency = uObjectTransparencies[objectIndex];
-    result.refractiveIndex = uObjectRefractiveIndices[objectIndex];
-    result.isEntry = false;
-
-    vec3 point = uObjectPositions[objectIndex];
-    vec3 normal = vec3(0.0, 1.0, 0.0); // Assuming y-up for planes
-    vec3 size = uObjectSizes[objectIndex];
-
-    // Calculate the denominator (dot product of ray direction and plane normal)
-    float denom = dot(rayDirection, normal);
-    
-    // If the ray is parallel to the plane, there's no intersection
-    if (abs(denom) < 0.0001) {
-        return result;
-    }
-    
-    // Calculate the distance to the plane
-    float t = dot(point - rayOrigin, normal) / denom;
-    
-    // If the intersection is behind the ray origin, there's no intersection
-    if (t < 0.0001) {
-        return result;
-    }
-    
-    // Calculate the intersection point
-    vec3 hitPoint = rayOrigin + rayDirection * t;
-    
-    // Check if the hit point is within the plane's bounds
-    if (abs(hitPoint.x - point.x) > size.x/2.0 || 
-        abs(hitPoint.z - point.z) > size.z/2.0) {
-        return result;
-    }
-    
-    result.hit = true;
-    result.distance = t;
-    result.point = hitPoint;
-    result.normal = normal;
-    result.isEntry = denom < 0.0; // If ray is moving towards plane, it's an entry
-    
-    return result;
-}
-
 IntersectionResult intersectBox(vec3 rayOrigin, vec3 rayDirection, int objectIndex) {
     IntersectionResult result;
     result.hit = false;
     result.distance = -1.0;
     result.point = vec3(0.0);
     result.normal = vec3(0.0);
-    result.color = uObjectColors[objectIndex];
-    result.reflectivity = uObjectReflectivities[objectIndex];
-    result.roughness = uObjectRoughnesses[objectIndex];
-    result.transparency = uObjectTransparencies[objectIndex];
-    result.refractiveIndex = uObjectRefractiveIndices[objectIndex];
+    result.objectIndex = objectIndex;
     result.isEntry = false;
 
     vec3 boxCenter = uObjectPositions[objectIndex];
@@ -251,14 +198,18 @@ IntersectionResult intersectBox(vec3 rayOrigin, vec3 rayDirection, int objectInd
     float tNear = max(max(t1.x, t1.y), t1.z);
     float tFar = min(min(t2.x, t2.y), t2.z);
     
+    // Check if there's a valid intersection
     if (tNear > tFar || tFar < 0.0) {
         return result;
     }
     
     float t = tNear;
-    if (t < 0.0) {
-        t = tFar;
-        if (t < 0.0) {
+    const float EPSILON = 0.01;
+    if (t < EPSILON) {
+        // If ray starts inside the box, allow intersection at tFar
+        if (tFar > EPSILON) {
+            t = tFar;
+        } else {
             return result;
         }
     }
@@ -286,7 +237,7 @@ IntersectionResult intersectBox(vec3 rayOrigin, vec3 rayDirection, int objectInd
     vec3 worldPoint = rotationMatrix * localHitPoint + boxCenter;
     vec3 worldNormal = normalize(rotationMatrix * localNormal);
     
-    // Ensure normal points outward
+    // Ensure normal points against the ray direction
     if (dot(rayDirection, worldNormal) > 0.0) {
         worldNormal = -worldNormal;
     }
@@ -300,29 +251,27 @@ IntersectionResult intersectBox(vec3 rayOrigin, vec3 rayDirection, int objectInd
     return result;
 }
 
-IntersectionResult intersectScene(vec3 rayOrigin, vec3 rayDirection) {
+IntersectionResult intersectScene(vec3 rayOrigin, vec3 rayDirection, int excludeObjectIndex) {
     IntersectionResult result;
     result.hit = false;
     result.distance = -1.0;
     result.point = vec3(0.0);
     result.normal = vec3(0.0);
-    result.color = vec3(0.0);
-    result.reflectivity = 0.0;
-    result.roughness = 0.0;
-    result.transparency = 0.0;
-    result.refractiveIndex = 1.0;
+    result.objectIndex = -1;
     result.isEntry = false;
 
     // Check all objects and keep the closest intersection
     for (int i = 0; i < uObjects; i++) {
+        if (i == excludeObjectIndex) {
+            continue;
+        }
+
         IntersectionResult currentResult;
         
         if (uObjectTypes[i] == 0) { // Sphere
             currentResult = intersectShape(rayOrigin, rayDirection, i);
-        } else if (uObjectTypes[i] == 1) { // Plane
+        } else if (uObjectTypes[i] == 1) { // Box
             currentResult = intersectBox(rayOrigin, rayDirection, i);
-        } else if (uObjectTypes[i] == 2) { // Box
-            currentResult = intersectPlane(rayOrigin, rayDirection, i);
         }
         
         if (currentResult.hit && (!result.hit || currentResult.distance < result.distance)) {
@@ -333,39 +282,196 @@ IntersectionResult intersectScene(vec3 rayOrigin, vec3 rayDirection) {
     return result;
 }
 
+vec3[4] getSamplePoints(int objectIndex) {
+    vec3 samplePoints[4];
+
+    if (uObjectTypes[objectIndex] == 1) {
+        vec3 sphereCenter = uObjectPositions[objectIndex];
+        float sphereRadius = uObjectSizes[objectIndex].x;
+
+        // Use fewer, more strategically placed sample points
+        samplePoints[0] = sphereCenter + vec3(0.0, sphereRadius * 0.9, 0.0);
+        samplePoints[1] = sphereCenter + vec3(sphereRadius * 0.9, 0.0, 0.0);
+        samplePoints[2] = sphereCenter + vec3(0.0, 0.0, sphereRadius * 0.9);
+        samplePoints[3] = sphereCenter + vec3(-sphereRadius * 0.7, -sphereRadius * 0.7, -sphereRadius * 0.7);
+
+        return samplePoints;
+    } else {
+        vec3 boxSize = uObjectSizes[objectIndex];
+        vec3 boxCenter = uObjectPositions[objectIndex];
+        mat3 rotationMatrix = createRotationMatrix(uObjectRotations[objectIndex]);
+
+        // Use fewer, more strategically placed sample points for boxes
+        samplePoints[0] = rotationMatrix * (boxCenter + vec3(-boxSize.x * 0.5, -boxSize.y * 0.5, -boxSize.z * 0.5));
+        samplePoints[1] = rotationMatrix * (boxCenter + vec3(boxSize.x * 0.5, boxSize.y * 0.5, boxSize.z * 0.5));
+        samplePoints[2] = rotationMatrix * (boxCenter + vec3(-boxSize.x * 0.5, boxSize.y * 0.5, -boxSize.z * 0.5));
+        samplePoints[3] = rotationMatrix * (boxCenter + vec3(boxSize.x * 0.5, -boxSize.y * 0.5, boxSize.z * 0.5));
+
+        return samplePoints;
+    }
+}
+
+vec3 calculateLighting(vec3 point, vec3 normal, vec3 viewDir, int objectIndex) {
+    // Early exit for light sources
+    if (uLightIntensities[objectIndex] > 0.0) {
+        return uLightColors[objectIndex] * uLightIntensities[objectIndex] * 0.9;
+    }
+
+    vec3 color = uObjectColors[objectIndex];
+    vec3 direct = vec3(0.0);
+    float normalDotView = dot(normal, viewDir);
+    
+    // Add sky lighting (ambient)
+    vec3 skyLight = getSkyColor(normal) * 0.2; // Scale down sky contribution
+    direct += skyLight;
+    
+    // Cache frequently used calculations
+    vec3 pointOffset = point + normal * 0.01;
+    
+    // Check all other objects
+    for (int i = 0; i < uObjects; i++) {
+        if (i == objectIndex) continue;
+
+        // Early exit if object is not a light source and GI is disabled
+        if (!GI_ENABLED && uLightIntensities[i] <= 0.001) continue;
+
+        vec3[4] samplePoints = getSamplePoints(i);
+        vec3 surfaceDirect = vec3(0.0);
+
+        for (int j = 0; j < 4; j++) {
+            vec3 samplePoint = samplePoints[j];
+            vec3 rayDir = normalize(samplePoint - point);
+            float normalDotRay = dot(rayDir, normal);
+            
+            // Skip if ray is pointing away from surface
+            if (normalDotRay <= 0.0) continue;
+
+            IntersectionResult result = intersectScene(pointOffset, rayDir, -1);
+            if (result.objectIndex == -1) {
+                // Add sky contribution when ray hits nothing
+                float skyFactor = max(0.0, normalDotRay);
+                surfaceDirect += getSkyColor(rayDir) * skyFactor * 0.1; // Scale down secondary sky contribution
+                continue;
+            }
+
+            float dist = length(result.point - point);
+            float distSquared = dist * dist;
+            
+            // Skip if too far away
+            if (distSquared > 100.0) continue;
+
+            if (uLightIntensities[result.objectIndex] > 0.001) {
+                float factor = normalDotRay * normalDotView;
+                direct += uLightColors[result.objectIndex] * uLightIntensities[result.objectIndex] * factor / distSquared;
+                continue;
+            }
+
+            if (!GI_ENABLED) continue;
+
+            // Secondary bounce lighting
+            vec3 secondaryPointOffset = result.point + result.normal * 0.01;
+            float secondaryNormalDotRay = dot(rayDir, result.normal);
+
+            for (int k = 0; k < uObjects; k++) {
+                if (k == i || k == result.objectIndex || uLightIntensities[k] <= 0.001) continue;
+
+                vec3[4] secondarySamplePoints = getSamplePoints(k);
+
+                for (int l = 0; l < 4; l++) {
+                    vec3 secondarySamplePoint = secondarySamplePoints[l];
+                    vec3 secondaryRayDir = normalize(secondarySamplePoint - result.point);
+                    
+                    // Skip if ray is pointing away from surface
+                    if (dot(secondaryRayDir, result.normal) <= 0.0) continue;
+
+                    IntersectionResult secondaryResult = intersectScene(secondaryPointOffset, secondaryRayDir, -1);
+                    if (secondaryResult.objectIndex == -1) {
+                        // Add sky contribution for secondary rays
+                        float skyFactor = max(0.0, dot(secondaryRayDir, result.normal));
+                        surfaceDirect += getSkyColor(secondaryRayDir) * skyFactor * 0.05; // Scale down tertiary sky contribution
+                        continue;
+                    }
+
+                    if (uLightIntensities[secondaryResult.objectIndex] > 0.001) {
+                        float secondaryDist = length(secondaryResult.point - result.point);
+                        float secondaryDistSquared = secondaryDist * secondaryDist;
+                        
+                        // Skip if too far away
+                        if (secondaryDistSquared > 100.0) continue;
+
+                        float factor = secondaryNormalDotRay * normalDotView;
+                        surfaceDirect += uLightColors[secondaryResult.objectIndex] * 
+                                       uLightIntensities[secondaryResult.objectIndex] * 
+                                       factor / secondaryDistSquared;
+                    }
+                }
+            }
+
+            float factor = normalDotRay * normalDotView;
+            direct += surfaceDirect * uObjectColors[result.objectIndex] * 
+                     uObjectReflectivities[result.objectIndex] * factor / distSquared;
+        }
+    }
+
+    return (color + 0.5) * direct;
+}
+
 // Example usage in your fragment shader:
 void main() {
     vec2 pixelCoord = gl_FragCoord.xy;
     vec2 ndc = (pixelCoord / uScreenSize) * 2.0 - 1.0;
     ndc.x *= uScreenSize.x / uScreenSize.y;
     
-    vec3 rayDir = normalize(vec3(ndc, -1.0));
-    rayDir = uCameraRotation * rayDir;
+    // Calculate ray direction in world space
+    vec3 forward = vec3(0.0, 0.0, -1.0);
+    vec3 right = vec3(1.0, 0.0, 0.0);
+    vec3 up = vec3(0.0, 1.0, 0.0);
+    
+    // Apply camera rotation to basis vectors
+    forward = uCameraRotation * forward;
+    right = uCameraRotation * right;
+    up = uCameraRotation * up;
+    
+    // Calculate ray direction using rotated basis vectors
+    vec3 rayDir = normalize(forward + right * ndc.x + up * ndc.y);
     
     vec3 color = vec3(0.0);
     vec3 rayOrigin = uCameraPosition;
     float rayEnergy = 1.0;
-    
+    IntersectionResult result;
+
     int i = 0;
-    for (; i < 50 && rayEnergy > 0.01; i++) {
-        IntersectionResult result = intersectScene(rayOrigin, rayDir);
+    for (; i < 5 && rayEnergy > 0.01; i++) {
+        result = intersectScene(rayOrigin, rayDir, -1);
         if (result.hit) {
-            rayOrigin = result.point + result.normal * 0.01;
-            rayDir = reflect(rayDir, result.normal);
-            color += result.color * (1.0 + result.roughness) * (1.0 - result.transparency) * rayEnergy;
-            rayEnergy *= result.reflectivity;
+            if (uLightIntensities[result.objectIndex] > 0.001) {
+                color += uLightColors[result.objectIndex] * uLightIntensities[result.objectIndex] * rayEnergy;
+                break;
+            }
+            // Calculate lighting at the intersection point
+            vec3 viewDir = -rayDir;
+            vec3 lighting = calculateLighting(result.point, result.normal, viewDir, result.objectIndex);
+            
+            // Add lighting to the color
+            color += lighting * rayEnergy;
+            
+            // Handle reflection
+            if (uObjectReflectivities[result.objectIndex] > 0.0) {
+                rayOrigin = result.point + result.normal * 0.01;
+                rayDir = reflect(rayDir, result.normal);
+                rayEnergy *= uObjectReflectivities[result.objectIndex];
+            } else {
+                break;
+            }
         } else {
-            color += getSkyColor(rayDir);
-            i++;
+            color += getSkyColor(rayDir) * rayEnergy;
             break;
         }
     }
 
-    // fragColor = vec4(rayDir, 1.0);
-
-    if (i == 0) {
+    if (i == 0 && !result.hit) {
         fragColor = vec4(getSkyColor(rayDir), 1.0);
     } else {
-        fragColor = vec4(color / float(i), 1.0);
+        fragColor = vec4(color, 1.0);
     }
 }

@@ -68,6 +68,8 @@ export class Scene {
                     ...data.renderSettings
                 };
             }
+
+            console.log("loaded scene: ", {scene: data});
         } catch (error) {
             console.error('Error loading scene:', error);
         }

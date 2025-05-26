@@ -1,0 +1,68 @@
+{
+    "version": "1.0",
+    "camera": {
+        "position": [0, 2, 5],
+        "rotation": [0, 0, 0],
+        "fov": 60,
+        "aspect": 1.0
+    },
+    "objects": [
+        {
+            "type": 0,
+            "position": [0, 0, 0],
+            "size": [1.0, 1.0, 1.0],
+            "rotation": [0, 0, 0],
+            "material": {
+                "color": [0.2, 0.2, 0.2],
+                "roughness": 0.2,
+                "reflectivity": 0.5,
+                "transparency": 0.0,
+                "refractiveIndex": 1.0
+            },
+            "lighting": {
+                "color": [1, 1, 1],
+                "intensity": 1.0
+            }
+        },
+        {
+            "type": 1,
+            "position": [0, -2, 0],
+            "size": [10, 0.1, 10],
+            "rotation": [0, 0, 0],
+            "material": {
+                "color": [1.0, 0.2, 0.2],
+                "roughness": 0.2,
+                "reflectivity": 0.5,
+                "transparency": 0.0,
+                "refractiveIndex": 1.0
+            },
+            "lighting": {
+                "color": [1, 1, 1],
+                "intensity": 1.0
+            }
+        },
+        {
+            "type": 1,
+            "position": [0, 2, 0],
+            "size": [10, 0.1, 10],
+            "rotation": [0.5, 0, 0],
+            "material": {
+                "color": [1.0, 0.2, 0.2],
+                "roughness": 0.2,
+                "reflectivity": 1.0,
+                "transparency": 0.0,
+                "refractiveIndex": 1.0
+            },
+            "lighting": {
+                "color": [1, 1, 1],
+                "intensity": 1.0
+            }
+        }
+    ],
+    "renderSettings": {
+        "maxBounces": 1,
+        "samplesPerPixel": 1,
+        "gamma": 2.2,
+        "exposure": 1.0
+    }
+} 

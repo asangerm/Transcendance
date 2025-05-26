@@ -6,4 +6,4 @@ import { renderHome } from './pages/home';
 initRouter();
 
 // Initial render
-renderHome(); 
+renderHome();

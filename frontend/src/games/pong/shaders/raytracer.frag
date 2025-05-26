@@ -347,7 +347,7 @@ vec3 calculateLighting(vec3 point, vec3 normal, vec3 viewDir, int objectIndex) {
             if (normalDotRay <= 0.0) continue;
 
             IntersectionResult result = intersectScene(pointOffset, rayDir, -1);
-            if (result.objectIndex == -1) {
+            if (result.objectIndex == -1 || result.objectIndex == objectIndex) {
                 // Add sky contribution when ray hits nothing
                 float skyFactor = max(0.0, normalDotRay);
                 surfaceDirect += getSkyColor(rayDir) * skyFactor * 0.1; // Scale down secondary sky contribution
@@ -385,7 +385,7 @@ vec3 calculateLighting(vec3 point, vec3 normal, vec3 viewDir, int objectIndex) {
                     if (dot(secondaryRayDir, result.normal) <= 0.0) continue;
 
                     IntersectionResult secondaryResult = intersectScene(secondaryPointOffset, secondaryRayDir, -1);
-                    if (secondaryResult.objectIndex == -1) {
+                    if (secondaryResult.objectIndex == -1 || secondaryResult.objectIndex == result.objectIndex) {
                         // Add sky contribution for secondary rays
                         float skyFactor = max(0.0, dot(secondaryRayDir, result.normal));
                         surfaceDirect += getSkyColor(secondaryRayDir) * skyFactor * 0.05; // Scale down tertiary sky contribution
@@ -413,7 +413,7 @@ vec3 calculateLighting(vec3 point, vec3 normal, vec3 viewDir, int objectIndex) {
         }
     }
 
-    return (color + 0.5) * direct;
+    return color * 1.5 * direct;
 }
 
 // Example usage in your fragment shader:
@@ -445,7 +445,7 @@ void main() {
         result = intersectScene(rayOrigin, rayDir, -1);
         if (result.hit) {
             if (uLightIntensities[result.objectIndex] > 0.001) {
-                color += uLightColors[result.objectIndex] * uLightIntensities[result.objectIndex] * rayEnergy;
+                color += uLightColors[result.objectIndex] * uLightIntensities[result.objectIndex] * rayEnergy * 10.0;
                 break;
             }
             // Calculate lighting at the intersection point

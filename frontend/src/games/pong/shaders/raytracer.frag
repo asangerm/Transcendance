@@ -341,7 +341,7 @@ vec3 calculateLighting(vec3 point, vec3 normal, vec3 viewDir, int objectIndex) {
         for (int j = 0; j < 4; j++) {
             vec3 samplePoint = samplePoints[j];
             vec3 rayDir = normalize(samplePoint - point);
-            float normalDotRay = dot(rayDir, normal);
+            float normalDotRay = 1.0;//dot(rayDir, normal);
             
             // Skip if ray is pointing away from surface
             if (normalDotRay <= 0.0) continue;

@@ -10,9 +10,12 @@ export class Renderer {
     private positionLocation: number;
     private scene: Scene;
     private initialized: boolean = false;
-    private cameraPositionElement: HTMLDivElement;
+    private textDisplay: HTMLDivElement;
+    private frameCount: number = 0;
+    private lastTime: number = performance.now();
+    private fps: number = 0;
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, textDisplay: HTMLDivElement) {
         this.canvas = canvas;
         const context = canvas.getContext('webgl2');
         if (!context) {
@@ -23,17 +26,7 @@ export class Renderer {
         this.vertexBuffer = null;
         this.positionLocation = -1;
         this.scene = new Scene();
-        
-        // Create camera position display element
-        this.cameraPositionElement = document.createElement('div');
-        this.cameraPositionElement.style.position = 'absolute';
-        this.cameraPositionElement.style.top = '10px';
-        this.cameraPositionElement.style.left = '10px';
-        this.cameraPositionElement.style.color = 'red';
-        this.cameraPositionElement.style.fontFamily = 'monospace';
-        this.cameraPositionElement.style.fontSize = '14px';
-        this.cameraPositionElement.style.zIndex = '1000';
-        document.body.appendChild(this.cameraPositionElement);
+        this.textDisplay = textDisplay;
         
         this.setupCanvas();
     }
@@ -150,8 +143,19 @@ export class Renderer {
         gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, 0, 0);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-        // Update camera position display
+        // Update FPS counter
+        this.frameCount++;
+        const currentTime = performance.now();
+        const elapsed = currentTime - this.lastTime;
+        
+        if (elapsed >= 1000) { // Update every second
+            this.fps = Math.round((this.frameCount * 1000) / elapsed);
+            this.frameCount = 0;
+            this.lastTime = currentTime;
+        }
+
+        // Update text display with camera position and FPS
         const pos = scene.camera.position;
-        this.cameraPositionElement.textContent = `Camera: (${pos[0].toFixed(2)}, ${pos[1].toFixed(2)}, ${pos[2].toFixed(2)})`;
+        this.textDisplay.textContent = `Camera: (${pos[0].toFixed(2)}, ${pos[1].toFixed(2)}, ${pos[2].toFixed(2)}) | FPS: ${this.fps}`;
     }
 } 

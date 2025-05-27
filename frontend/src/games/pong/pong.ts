@@ -5,6 +5,8 @@ import { Scene } from './Scene';
 
 export class PongGame {
     private canvas: HTMLCanvasElement;
+    private canvasContainer: HTMLDivElement;
+    // private textDisplay: HTMLDivElement;
     private renderer: Renderer;
     private scene: Scene;
     private inputHandler: InputHandler;
@@ -12,13 +14,42 @@ export class PongGame {
 
     constructor() {
         this.canvas = document.createElement('canvas');
+        
+        this.canvasContainer = document.createElement('div');
+        this.canvasContainer.className = 'pong-container';
+        this.canvasContainer.classList.add('relative', 'w-full', 'h-full', 'rows-1', 'columns-2');
+
+        const textDisplay = document.createElement('div');
+        textDisplay.className = 'pong-text-display';
+        textDisplay.classList.add(
+            'absolute',
+            'top-0',
+            'left-0',
+            'w-full',
+            'bg-black/50',
+            'text-red-600',
+            'stroke-8',
+            'stroke-red-500',
+            'p-2',
+            'z-10',
+            'font-mono'
+        );
+        textDisplay.textContent = 'Camera: (0, 0, 0) | FPS: 0';
+        
+        this.canvasContainer.appendChild(this.canvas);
+        this.canvasContainer.appendChild(textDisplay);
+        
+        // this.textDisplay = document.createElement('div');
+        // this.textDisplay.className = 'pong-text-display';
+        // this.textDisplay.classList.add('absolute', 'top-0', 'left-0', 'border-2', 'border-red-600', 'text-left', 'text-red-600');
+        
         this.scene = new Scene();
-        this.renderer = new Renderer(this.canvas);
+        this.renderer = new Renderer(this.canvas, textDisplay);
         this.inputHandler = new InputHandler();
     }
 
     async mount(element: HTMLElement): Promise<void> {
-        element.appendChild(this.canvas);
+        element.appendChild(this.canvasContainer);
         this.handleResize();
         window.addEventListener('resize', this.handleResize.bind(this));
         await this.renderer.initialize();

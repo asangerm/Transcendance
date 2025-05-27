@@ -1,4 +1,5 @@
 import { TroopManager } from './TroopManager.js';
+import { CustomButton } from './CustomButton.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -10,7 +11,11 @@ export class GameScene extends Phaser.Scene {
     const g = this.make.graphics({ x: 0, y: 0, add: false });
     g.fillStyle(0x55aa55, 1);
     g.fillRect(0, 0, 32, 32);
-    g.generateTexture('troop', 32, 32);
+    g.generateTexture('melee', 32, 32);
+    g.fillRect(0, 0, 25, 25);
+    g.generateTexture('range', 25, 25);
+    g.fillRect(0, 0, 38, 38);
+    g.generateTexture('tank', 38, 38);
     g.destroy();
   }
 
@@ -28,18 +33,8 @@ export class GameScene extends Phaser.Scene {
 
     this.troopManager = new TroopManager(this, this.castleLeft, this.castleRight);
 
-    this.time.addEvent({
-      delay: 2000,
-      callback: () => this.troopManager.spawnTroop('left'),
-      loop: true
-    });
-
-    this.time.addEvent({
-      delay: 2000,
-      callback: () => this.troopManager.spawnTroop('right'),
-      loop: true
-    });
   }
+
 
   createWorld() {
     // Route
@@ -58,15 +53,22 @@ export class GameScene extends Phaser.Scene {
     g1.generateTexture('castle', 64, 160);
     g1.destroy();
 
-    this.castleLeft = this.add.image(64, 720 - 90, 'castle').setOrigin(0, 1);
-    this.castleRight = this.add.image(1280 - 64, 720 - 90, 'castle').setOrigin(1, 1);
+    // Création des châteaux avec physics
+    this.castleLeft = this.physics.add.sprite(64, 720 - 90, 'castle');
+    this.castleRight = this.physics.add.sprite(1280 - 64, 720 - 90, 'castle');
+    
+    // Configuration des propriétés physiques
+    this.castleLeft.setOrigin(0, 1).setImmovable(true);
+    this.castleRight.setOrigin(1, 1).setImmovable(true);
+    
+    // Initialisation de la santé
     this.castleLeft.health = 100;
     this.castleRight.health = 100;
 
-	this.scene.get('UIScene').events.emit('castle-ready', {
-	castleLeft: this.castleLeft,
-	castleRight: this.castleRight
-	});
+    this.scene.get('UIScene').events.emit('castle-ready', {
+      castleLeft: this.castleLeft,
+      castleRight: this.castleRight
+    });
   }
 
   update() {

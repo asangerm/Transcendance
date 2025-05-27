@@ -1,6 +1,7 @@
-export class CustomButton {
-
-	constructor(scene, x, y, text, onClick, options = {}) {
+export class CustomButton
+{
+	constructor(scene, x, y, text, onClick, options = {})
+	{
 		this.scene = scene;
 		this.isOnCooldown = false;
 		this.cooldownDuration = options.cooldown || 2000;
@@ -18,7 +19,8 @@ export class CustomButton {
 		const name = 'buttonTexture_' + buttonWidth + '_' + buttonHeight
 
 		//Création de la texture du bouton
-		if (!scene.textures.exists(name)) {
+		if (!scene.textures.exists(name))
+		{
 			const buttonGraphics = scene.make.graphics({ x: 0, y: 0, add: false });
             
             // Ombre
@@ -49,32 +51,41 @@ export class CustomButton {
 		this.setupInteraction(onClick);
 	}
 
-	setupInteraction(onClick) {
+	setupInteraction(onClick)
+	{
 		const originalY = this.button.y;
 
 		// Survolement du bouton
-		this.button.on('pointerover', () => {
-			if (!this.isOnCooldown) {
+		this.button.on('pointerover', () =>
+		{
+			if (!this.isOnCooldown)
+			{
 				this.button.setTint(0xc1bebe);
 			}
 		});
 
-		this.button.on('pointerout', () => {
-			if (!this.isOnCooldown) {
+		this.button.on('pointerout', () =>
+		{
+			if (!this.isOnCooldown)
+			{
 				this.button.clearTint();
 			}
 		});
 
-		this.button.on('pointerdown', () => {
-			if (!this.isOnCooldown) {
+		this.button.on('pointerdown', () =>
+		{
+			if (!this.isOnCooldown)
+			{
                 this.button.setTint(0xc1bebe);
                 this.button.setY(originalY + 3);
                 this.text.setY(originalY + 3);
 			}
 		});
 
-		this.button.on('pointerup', () => {
-			if (!this.isOnCooldown) {
+		this.button.on('pointerup', () =>
+		{
+			if (!this.isOnCooldown)
+			{
 				this.button.clearTint();
                 this.button.setY(originalY);
                 this.text.setY(originalY);
@@ -83,7 +94,8 @@ export class CustomButton {
 		});
 	}
 
-	startCooldown(onClick) {
+	startCooldown(onClick)
+	{
 		if (this.isOnCooldown) return;
 
 		this.isOnCooldown = true;
@@ -95,14 +107,17 @@ export class CustomButton {
 		let elapsed = 0;
         const interval = 16; // ~60fps
 
-		const updateTimer = this.scene.time.addEvent({
+		const updateTimer = this.scene.time.addEvent(
+		{
             delay: interval,
-            callback: () => {
+            callback: () =>
+			{
                 elapsed += interval;
                 const progress = elapsed / this.cooldownDuration;
                 this.updateProgressBar(progress);
 
-                if (elapsed >= this.cooldownDuration) {
+                if (elapsed >= this.cooldownDuration)
+				{
                     updateTimer.destroy();
                     this.endCooldown();
 					onClick();
@@ -114,7 +129,8 @@ export class CustomButton {
 	}
 
 	
-    updateProgressBar(progress) {
+    updateProgressBar(progress)
+	{
         const x = this.button.x - this.buttonWidth / 2 ;
         const y = this.button.y + (this.buttonHeight / 2) - this.progressHeight - 2;
         const radius = 8;
@@ -126,7 +142,8 @@ export class CustomButton {
         this.progressBar.fillRect(x, y, this.progressWidth, this.progressHeight);
         
         // Barre de progression
-        if (progress >= 0) {
+        if (progress >= 0)
+		{
             const width = this.progressWidth * progress;
             this.progressBar.fillStyle(0xc1bebe, 0.5);
 
@@ -141,26 +158,30 @@ export class CustomButton {
         }
     }
 
-    endCooldown() {
+    endCooldown()
+	{
         this.isOnCooldown = false;
         this.button.clearTint();
         this.progressBar.setVisible(false);
     }
 
-    setPosition(x, y) {
+    setPosition(x, y)
+	{
         this.button.setPosition(x, y);
         this.text.setPosition(x, y);
         return this;
     }
 
-    setVisible(visible) {
+    setVisible(visible)
+	{
         this.button.setVisible(visible);
         this.text.setVisible(visible);
         this.progressBar.setVisible(visible && this.isOnCooldown);
         return this;
     }
 
-    destroy() {
+    destroy()
+	{
         this.button.destroy();
         this.text.destroy();
         this.progressBar.destroy();

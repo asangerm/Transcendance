@@ -2,26 +2,20 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install OpenSSL and other required dependencies
+# Install required OS packages
 RUN apk add --no-cache openssl openssl-dev sqlite
 
-# Copy package files
-COPY package*.json ./
+# Copy app files first
+COPY . .
 
 # Install dependencies
 RUN npm install
 
-# Install prisma for init.sh
-RUN npm install prisma --save-dev
-
-# Copy the rest of the application
-COPY . .
-
 # Make init script executable
 RUN chmod +x init.sh
 
-# Expose port 8000
+# Expose backend port
 EXPOSE 8000
 
-# Start the application with initialization
-CMD ["/bin/sh", "./init.sh"] 
+# Start application via init script
+CMD ["/bin/sh", "./init.sh"]

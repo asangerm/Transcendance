@@ -64,6 +64,8 @@ export class GameScene extends Phaser.Scene
 		// Initialisation de la santé
 		this.castleLeft.health = 100;
 		this.castleRight.health = 100;
+		this.castleLeft.money = 100;
+		this.castleRight.money = 100;
 
 		this.scene.get('UIScene').events.emit('castle-ready',
 		{

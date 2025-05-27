@@ -9,6 +9,7 @@ const TROOP_TYPES =
 		damage: 1,
 		speed: 80,
 		cost: 10,
+		reward: 20,
 		castleDamage: 10,
 		color: 0x55aa55,
 		attackRange: 40,	// Portée d'attaque minimale
@@ -22,6 +23,7 @@ const TROOP_TYPES =
 		damage: 0.5,
 		speed: 80,
 		cost: 30,
+		reward: 60,
 		castleDamage: 3,
 		color: 0x8888ff,
 		attackRange: 50,
@@ -35,6 +37,7 @@ const TROOP_TYPES =
 		damage: 1.5,
 		speed: 80,
 		cost: 15,
+		reward: 30,
 		castleDamage: 2,
 		color: 0xff8888,
 		attackRange: 150,	// Grande portée d'attaque
@@ -87,17 +90,20 @@ export class TroopManager
 		});
 	}
 
-	requestTroopSpawn(team, troopType = 'MELEE')
+	requestTroopSpawn(team, troopType = 'MELEE', castle)
 	{
 		// Crée une demande de spawn
 		const spawnRequest =
 		{
 			team,
-			troopType
+			troopType,
+			castle,  // On stocke la référence au château pour déduire le coût plus tard
+			cost: this.getTroopCost(troopType)
 		};
 
 		// Ajoute à la file d'attente
 		this.spawnQueue[team].push(spawnRequest);
+
 		// Si c'est la première troupe, on essaie de la spawner immédiatement
 		if (this.spawnQueue[team].length === 1)
 		{
@@ -109,20 +115,27 @@ export class TroopManager
 	{
 		const queue = this.spawnQueue[team];
 		if (queue.length === 0) return;
+
 		// Vérifie si la zone est libre
 		if (this.isSpawnAreaClear(team))
 		{
 			// Spawn la troupe
 			const nextSpawn = queue[0];
-			const troop = this.createTroop(team, nextSpawn.troopType);
 			
-			// Retire la demande de la file
-			queue.shift();
-
-			// Attend 500ms avant d'essayer de spawner la prochaine troupe
-			if (queue.length > 0)
+			// Vérifie si le château a toujours assez d'argent
+			if (nextSpawn.castle.money >= 0) // On vérifie juste que le château existe
 			{
-				this.scene.time.delayedCall(500, () => this.trySpawnNextTroop(team));
+				// Crée la troupe sans déduire le coût
+				const troop = this.createTroop(team, nextSpawn.troopType);
+				
+				// Retire la demande de la file
+				queue.shift();
+
+				// Attend 500ms avant d'essayer de spawner la prochaine troupe
+				if (queue.length > 0)
+				{
+					this.scene.time.delayedCall(500, () => this.trySpawnNextTroop(team));
+				}
 			}
 		}
 		else
@@ -157,6 +170,7 @@ export class TroopManager
 		troop.attackRange = type.attackRange;
 		troop.walkStopRange = type.walkStopRange;
 		troop.facing = team;
+		troop.reward = type.reward;
 		troop.setTint(type.color);
 
 		const graphics = this.scene.add.graphics();
@@ -175,6 +189,11 @@ export class TroopManager
 	spawnTroop(team, troopType = 'MELEE')
 	{
 		return this.requestTroopSpawn(team, troopType);
+	}
+
+	getTroopCost(type)
+	{
+		return TROOP_TYPES[type]?.cost || 0;
 	}
 
 	update()
@@ -422,6 +441,10 @@ export class TroopManager
 
 		if (target.hp <= 0)
 		{
+			// Attribuer la récompense au château correspondant
+			const castle = attacker.team === 'left' ? this.castleLeft : this.castleRight;
+			castle.money += target.reward;
+
 			const graphics = this.attackZoneGraphics.get(target);
 			const walkStopZoneGraphics = this.WalkStopZoneGraphics.get(target);
 			if (graphics)

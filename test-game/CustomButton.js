@@ -22,15 +22,15 @@ export class CustomButton
 		if (!scene.textures.exists(name))
 		{
 			const buttonGraphics = scene.make.graphics({ x: 0, y: 0, add: false });
-            
-            // Ombre
-            buttonGraphics.fillStyle(0x000000, 0.4);
-            buttonGraphics.fillRoundedRect(5, 5, buttonWidth, buttonHeight, 10);
-            // Couleur de fond du bouton
-            buttonGraphics.fillStyle(buttonColor, 1);
-            buttonGraphics.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 10);
-            buttonGraphics.generateTexture(name, buttonWidth + 5, buttonHeight + 5);
-            buttonGraphics.destroy();
+			
+			// Ombre
+			buttonGraphics.fillStyle(0x000000, 0.4);
+			buttonGraphics.fillRoundedRect(5, 5, buttonWidth, buttonHeight, 10);
+			// Couleur de fond du bouton
+			buttonGraphics.fillStyle(buttonColor, 1);
+			buttonGraphics.fillRoundedRect(0, 0, buttonWidth, buttonHeight, 10);
+			buttonGraphics.generateTexture(name, buttonWidth + 5, buttonHeight + 5);
+			buttonGraphics.destroy();
 		}
 
 		// Création du bouton
@@ -76,9 +76,9 @@ export class CustomButton
 		{
 			if (!this.isOnCooldown)
 			{
-                this.button.setTint(0xc1bebe);
-                this.button.setY(originalY + 3);
-                this.text.setY(originalY + 3);
+				this.button.setTint(0xc1bebe);
+				this.button.setY(originalY + 3);
+				this.text.setY(originalY + 3);
 			}
 		});
 
@@ -87,8 +87,8 @@ export class CustomButton
 			if (!this.isOnCooldown)
 			{
 				this.button.clearTint();
-                this.button.setY(originalY);
-                this.text.setY(originalY);
+				this.button.setY(originalY);
+				this.text.setY(originalY);
 				this.startCooldown(onClick);
 			}
 		});
@@ -98,92 +98,105 @@ export class CustomButton
 	{
 		if (this.isOnCooldown) return;
 
+		// Exécuter l'action immédiatement et stocker la fonction de spawn
+		const spawnFunction = onClick();
+
 		this.isOnCooldown = true;
 
-        // Afficher et réinitialiser la barre de progression
-        this.progressBar.setVisible(true);
-        this.updateProgressBar(0);
+		// Afficher et réinitialiser la barre de progression
+		this.progressBar.setVisible(true);
+		this.updateProgressBar(0);
 
 		let elapsed = 0;
-        const interval = 16; // ~60fps
+		const interval = 16; // ~60fps
 
 		const updateTimer = this.scene.time.addEvent(
 		{
-            delay: interval,
-            callback: () =>
+			delay: interval,
+			callback: () =>
 			{
-                elapsed += interval;
-                const progress = elapsed / this.cooldownDuration;
-                this.updateProgressBar(progress);
+				elapsed += interval;
+				const progress = elapsed / this.cooldownDuration;
+				this.updateProgressBar(progress);
 
-                if (elapsed >= this.cooldownDuration)
+				if (elapsed >= this.cooldownDuration)
 				{
-                    updateTimer.destroy();
-                    this.endCooldown();
-					onClick();
-                }
-            },
-            loop: true
-        });
+					updateTimer.destroy();
+					this.endCooldown();
+					spawnFunction(); // Exécuter la fonction de spawn après le cooldown
+				}
+			},
+			loop: true
+		});
 		
 	}
 
 	
-    updateProgressBar(progress)
+	updateProgressBar(progress)
 	{
-        const x = this.button.x - this.buttonWidth / 2 ;
-        const y = this.button.y + (this.buttonHeight / 2) - this.progressHeight - 2;
-        const radius = 8;
+		const x = this.button.x - this.buttonWidth / 2 ;
+		const y = this.button.y + (this.buttonHeight / 2) - this.progressHeight - 2;
+		const radius = 8;
 
-        this.progressBar.clear();
-        
-        // Fond de la barre
-        this.progressBar.fillStyle(0xc1bebe, 0);
-        this.progressBar.fillRect(x, y, this.progressWidth, this.progressHeight);
-        
-        // Barre de progression
-        if (progress >= 0)
+		this.progressBar.clear();
+		
+		// Fond de la barre
+		this.progressBar.fillStyle(0xc1bebe, 0);
+		this.progressBar.fillRect(x, y, this.progressWidth, this.progressHeight);
+		
+		// Barre de progression
+		if (progress >= 0)
 		{
-            const width = this.progressWidth * progress;
-            this.progressBar.fillStyle(0xc1bebe, 0.5);
+			const width = this.progressWidth * progress;
+			this.progressBar.fillStyle(0xc1bebe, 0.5);
 
-            // Dessine un rectangle pour le corps de la barre
-            this.progressBar.fillRect(x + radius, y, Math.max(0, width - radius), this.progressHeight);
+			// Dessine un rectangle pour le corps de la barre
+			this.progressBar.fillRect(x + radius, y, Math.max(0, width - radius), this.progressHeight);
 
-            // Dessine le côté gauche arrondi
-            this.progressBar.beginPath();
-            this.progressBar.arc(x + radius, y + radius, radius, Math.PI, Math.PI * 1.5);
-            this.progressBar.arc(x + radius, y + this.progressHeight - radius, radius, Math.PI * 0.5, Math.PI);
-            this.progressBar.fill();
-        }
-    }
+			// Dessine le côté gauche arrondi
+			this.progressBar.beginPath();
+			this.progressBar.arc(x + radius, y + radius, radius, Math.PI, Math.PI * 1.5);
+			this.progressBar.arc(x + radius, y + this.progressHeight - radius, radius, Math.PI * 0.5, Math.PI);
+			this.progressBar.fill();
+		}
+	}
 
-    endCooldown()
+	endCooldown()
 	{
-        this.isOnCooldown = false;
-        this.button.clearTint();
-        this.progressBar.setVisible(false);
-    }
+		this.isOnCooldown = false;
+		this.button.clearTint();
+		this.progressBar.setVisible(false);
+	}
 
-    setPosition(x, y)
+	setPosition(x, y)
 	{
-        this.button.setPosition(x, y);
-        this.text.setPosition(x, y);
-        return this;
-    }
+		this.button.setPosition(x, y);
+		this.text.setPosition(x, y);
+		return this;
+	}
 
-    setVisible(visible)
+	setVisible(visible)
 	{
-        this.button.setVisible(visible);
-        this.text.setVisible(visible);
-        this.progressBar.setVisible(visible && this.isOnCooldown);
-        return this;
-    }
+		this.button.setVisible(visible);
+		this.text.setVisible(visible);
+		this.progressBar.setVisible(visible && this.isOnCooldown);
+		return this;
+	}
 
-    destroy()
+	destroy()
 	{
-        this.button.destroy();
-        this.text.destroy();
-        this.progressBar.destroy();
-    }
+		this.button.destroy();
+		this.text.destroy();
+		this.progressBar.destroy();
+	}
+
+	setEnabled(enabled)
+	{
+		this.button.disableInteractive();
+		this.text.setAlpha(0.5);
+		if (enabled) {
+			this.button.setInteractive({ useHandCursor: true });
+			this.text.setAlpha(1);
+		}
+	}
 }

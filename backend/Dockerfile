@@ -11,6 +11,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+# Install prisma for init.sh
+RUN npm install prisma --save-dev
+
 # Copy the rest of the application
 COPY . .
 

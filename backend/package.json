@@ -3,21 +3,32 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/main.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/main.js",
+    "start:dev": "ts-node src/main.ts"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.1",
-    "@prisma/client": "^5.10.2",
+    "@nestjs/common": "^11.1.2",
+    "@nestjs/core": "^11.1.2",
+    "@nestjs/platform-express": "^11.1.2",
+    "@prisma/client": "^5.22.0",
+    "bcrypt": "^6.0.0",
     "better-sqlite3": "^9.4.3",
-    "fastify": "^4.26.2"
+    "fastify": "^4.26.2",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
+    "@nestjs/cli": "^11.0.7",
+    "@nestjs/schematics": "^11.0.5",
+    "@types/bcrypt": "^5.0.2",
     "@types/better-sqlite3": "^7.6.9",
-    "@types/node": "^20.11.27",
-    "prisma": "^5.10.2",
+    "@types/node": "^20.17.50",
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2",
     "tsx": "^4.7.1",
-    "typescript": "^5.4.2"
+    "typescript": "^5.8.3"
   }
-} 
+}

@@ -5,8 +5,12 @@ type Route = {
 
 const routes: Route[] = [
     { path: '/', component: () => import('./pages/home').then(m => m.renderHome()) },
+    { path: '/games', component: () => import('./pages/game-selection').then(m => m.renderGameSelection()) },
     { path: '/game', component: () => import('./pages/game').then(m => m.renderGame()) },
-    { path: '/profile', component: () => import('./pages/profile').then(m => m.renderProfile()) }
+    { path: '/profile', component: () => import('./pages/profile').then(m => m.renderProfile()) },
+    { path: '/login', component: () => import('./pages/login').then(m => m.renderLogin()) },
+    { path: '/forgot-password', component: () => import('./pages/forgot-password').then(m => m.renderForgotPassword()) },
+    { path: '/register', component: () => import('./pages/register').then(m => m.renderRegister()) }
 ];
 
 export function initRouter() {

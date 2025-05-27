@@ -5,7 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ft_transcendence</title>
   </head>
-  <body>
+  <body class="pt-16">
+	<nav class="bg-white shadow-lg fixed top-0 left-0 right-0 z-50">
+		<div class="max-w-6xl mx-auto px-4">
+			<div class="flex justify-between">
+				<div class="flex space-x-7">
+					<div class="flex items-center py-4">
+						<a href="/" data-nav class="font-semibold text-gray-500 text-lg">ft_transcendence</a>
+					</div>
+				</div>
+				<div class="flex items-center space-x-3">
+					<a href="/games" data-nav class="py-2 px-4 text-gray-500 hover:text-gray-700">Games</a>
+					<a href="/profile" data-nav class="py-2 px-4 text-gray-500 hover:text-gray-700">Profile</a>
+					<div class="border-l border-gray-300 h-6 mx-2"></div>
+					<a href="/login" data-nav class="py-2 px-4 text-gray-500 hover:text-gray-700">Connexion</a>
+					<a href="/register" data-nav class="py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300">Inscription</a>
+				</div>
+			</div>
+		</div>
+	</nav>
+
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

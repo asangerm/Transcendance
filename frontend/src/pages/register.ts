@@ -1,14 +1,14 @@
 export function renderRegister() {
     const content = `
-        <div class="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div class="min-h-screen flex items-center justify-center">
             <div class="max-w-md w-full mx-auto">
-                <div class="bg-white rounded-xl shadow-lg p-8 transform transition-all duration-300 hover:shadow-2xl">
-                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Inscription</h2>
+                <div class="bg-primary dark:bg-primary-dark rounded-xl shadow-lg p-8 transform transition-all duration-300 hover:shadow-2xl">
+                    <h2 class="text-3xl font-bold text-center mb-8">Inscription</h2>
                     
                     <form id="registerForm" class="space-y-6">
                         <!-- Username Input -->
                         <div>
-                            <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="username" class="block text-sm font-medium mb-2">
                                 Nom d'utilisateur
                             </label>
                             <input
@@ -23,7 +23,7 @@ export function renderRegister() {
 
                         <!-- Email Input -->
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="email" class="block text-sm font-medium mb-2">
                                 Email
                             </label>
                             <input
@@ -38,7 +38,7 @@ export function renderRegister() {
 
                         <!-- Password Input -->
                         <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="password" class="block text-sm font-medium mb-2">
                                 Mot de passe
                             </label>
                             <input
@@ -53,7 +53,7 @@ export function renderRegister() {
 
                         <!-- Confirm Password Input -->
                         <div>
-                            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="confirmPassword" class="block text-sm font-medium mb-2">
                                 Confirmer le mot de passe
                             </label>
                             <input
@@ -78,9 +78,9 @@ export function renderRegister() {
                                 >
                             </div>
                             <div class="ml-3">
-                                <label for="terms" class="text-sm text-gray-700">
-                                    J'accepte les <a href="#" class="text-blue-600 hover:text-blue-800">conditions d'utilisation</a>
-                                    et la <a href="#" class="text-blue-600 hover:text-blue-800">politique de confidentialité</a>
+                                <label for="terms" class="text-sm text-muted dark:text-muted-dark">
+                                    J'accepte les <a href="#" class="links-style">conditions d'utilisation</a>
+                                    et la <a href="#" class="links-style">politique de confidentialité</a>
                                 </label>
                             </div>
                         </div>
@@ -88,15 +88,15 @@ export function renderRegister() {
                         <!-- Submit Button -->
                         <button
                             type="submit"
-                            class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition-all duration-300 hover:scale-[1.02]"
+                            class="w-full button-primary"
                         >
                             S'inscrire
                         </button>
 
                         <!-- Login Link -->
                         <div class="text-center mt-4">
-                            <span class="text-gray-600">Déjà un compte?</span>
-                            <a href="login" class="text-blue-600 hover:text-blue-800 ml-1 transition-all duration-300">
+                            <span class="text-muted dark:text-muted-dark">Déjà un compte?</span>
+                            <a href="/login" class="links-style">
                                 Se connecter
                             </a>
                         </div>

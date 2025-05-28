@@ -11,3 +11,15 @@ body {
 .force-tailwind {
   @apply bg-white text-black p-4 m-4 rounded-lg shadow-md;
 } 
+
+.button-primary {
+	@apply py-2 px-6 bg-button text-button-text font-medium rounded-lg hover:bg-button hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-md dark:bg-button-dark dark:text-button-text-dark;
+}
+
+.button-secondary {
+	@apply px-6 py-3 border-2 border-button text-button font-medium rounded-lg hover:bg-button hover:text-text-dark transform transition-all duration-300 hover:scale-105 dark:border-button-dark dark:text-button-dark dark:hover:bg-button-dark dark:hover:text-text;
+}
+
+.links-style {
+	@apply text-link dark:text-link-dark hover:text-link-hover dark:hover:text-link-hover-dark ml-1 transition-all duration-300;
+}

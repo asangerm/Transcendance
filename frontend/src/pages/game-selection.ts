@@ -1,13 +1,13 @@
 export function renderGameSelection() {
     const content = `
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen">
             <main class="container mx-auto px-4 py-8">
-                <h1 class="text-4xl font-bold text-center text-gray-800 mb-12">Sélection des Jeux</h1>
+                <h1 class="text-4xl font-bold text-center mb-12">Sélection des Jeux</h1>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                     <!-- Pong Game Card -->
-                    <a href="/game" class="group">
-                        <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-                            <div class="relative aspect-video bg-gray-900">
+                    <a href="/pong" class="group">
+                        <div class="bg-primary dark:bg-primary-dark rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                            <div class="relative aspect-video bg-secondary dark:bg-secondary-dark">
                                 <img 
                                     src="../../images/pong-image.jpg" 
                                     alt="Pong Game" 
@@ -20,16 +20,16 @@ export function renderGameSelection() {
                                 </div>
                             </div>
                             <div class="p-6">
-                                <h2 class="text-2xl font-bold text-gray-800 mb-2">Pong</h2>
-                                <p class="text-gray-600">Le classique jeu de tennis de table revisité</p>
+                                <h2 class="text-2xl font-bold mb-2">Pong</h2>
+                                <p class="text-muted dark:text-muted-dark">Le classique jeu de tennis de table revisité</p>
                             </div>
                         </div>
                     </a>
 
                     <!-- Second Game Card -->
-                    <a href="/game" class="group">
-                        <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-                            <div class="relative aspect-video bg-gray-900">
+                    <a href="/game2" class="group">
+                        <div class="bg-primary dark:bg-primary-dark rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                            <div class="relative aspect-video bg-secondary dark:bg-secondary-dark">
                                 <img 
                                     src="../../images/ageOfWar.jpg" 
                                     alt="Second Game" 
@@ -42,8 +42,8 @@ export function renderGameSelection() {
                                 </div>
                             </div>
                             <div class="p-6">
-                                <h2 class="text-2xl font-bold text-gray-800 mb-2">Jeu 2</h2>
-                                <p class="text-gray-600">Description du deuxième jeu</p>
+                                <h2 class="text-2xl font-bold mb-2">Jeu 2</h2>
+                                <p class="text-muted dark:text-muted-dark">Description du deuxième jeu</p>
                             </div>
                         </div>
                     </a>

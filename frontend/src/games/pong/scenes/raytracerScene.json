@@ -8,89 +8,37 @@
     },
     "objects": [
         {
-            "type": 0,
-            "name": "sphere1",
-            "position": [1.5, -3, 0],
-            "size": [1.0, 1.0, 1.0],
+            "type": "box",
+            "name": "ground",
+            "collisions": true,
+            "position": [0, -5, 0],
+            "size": [100, 1, 100],
             "rotation": [0, 0, 0],
             "material": {
-                "color": [1.0, 0.2, 0.2],
-                "roughness": 0.85,
-                "reflectivity": 0.0,
-                "transparency": 0.0,
-                "refractiveIndex": 1.0
-            },
-            "lighting": {
-                "color": [1, 1, 1],
-                "intensity": 0.0
-            }
-        },
-        {
-            "type": 0,
-            "name": "sphere3",
-            "position": [1.50, 0, 0],
-            "size": [0.1, 0.1, 0.1],
-            "rotation": [0, 0, 0],
-            "material": {
-                "color": [0.2, 0.2, 0.2],
-                "roughness": 0.2,
-                "reflectivity": 0.1,
-                "transparency": 0.0,
-                "refractiveIndex": 1.0
-            },
-            "lighting": {
-                "color": [0.0, 0.0, 1.5],
-                "intensity": 2.0
-            }
-        },
-        {
-            "type": 0,
-            "name": "sphere2",
-            "position": [0, 0, 0],
-            "size": [1.0, 1.0, 1.0],
-            "rotation": [0, 0, 0],
-            "material": {
-                "color": [0.2, 0.2, 0.2],
-                "roughness": 0.2,
-                "reflectivity": 0.1,
-                "transparency": 0.0,
-                "refractiveIndex": 1.0
-            },
-            "lighting": {
-                "color": [1, 1, 1],
-                "intensity": 0.0
-            }
-        },
-        {
-            "type": 1,
-            "name": "square1",
-            "position": [0, 5, 0],
-            "size": [10, 0.1, 10],
-            "rotation": [0.5, 0, 0],
-            "material": {
-                "color": [1.0, 0.2, 0.2],
+                "color": [0.5, 0.5, 0.5],
                 "roughness": 0.8,
-                "reflectivity": 0.5,
-                "transparency": 0.0,
-                "refractiveIndex": 1.0
+                "reflectivity": 0.1,
+                "transparency": 0.5,
+                "refractiveIndex": 1.5
             },
             "lighting": {
                 "color": [1, 1, 1],
-                "intensity": 10.0
+                "intensity": 0.0
             }
         },
         {
-            "type": 1,
-            "name": "BOITE DE SES MORTS",
-            "position": [0, -10, 0],
-            "size": [1000.0, 1.0, 1000.0],
+            "type": "box",
+            "name": "wall_left",
+            "collisions": true,
+            "position": [-50, 0, 0],
+            "size": [50, 22, 200],
             "rotation": [0, 0, 0],
             "material": {
-                "color": [0.0, 0.2, 0.8],
-                "roughness": 1.0,
+                "color": [0.5, 0.5, 0.5],
+                "roughness": 0.8,
                 "reflectivity": 0.0,
-                "transparency": 0.0,
-                "refractiveIndex": 1.0
+                "transparency": 0.5,
+                "refractiveIndex": 1.5
             },
             "lighting": {
                 "color": [1, 1, 1],
@@ -98,21 +46,117 @@
             }
         },
         {
-            "type": 1,
-            "name": "wall",
-            "position": [0, 2, 0],
-            "size": [10, 0.1, 10],
-            "rotation": [0.5, 0, 0],
+            "type": "box",
+            "name": "wall_right",
+            "collisions": true,
+            "position": [50, 0, 0],
+            "size": [50, 22, 200],
+            "rotation": [0, 0, 0],
             "material": {
-                "color": [1.0, 0.2, 0.2],
-                "roughness": 1.0,
-                "reflectivity": 0.5,
-                "transparency": 0.0,
-                "refractiveIndex": 1.0
+                "color": [0.5, 0.5, 0.5],
+                "roughness": 0.8,
+                "reflectivity": 0.0,
+                "transparency": 0.5,
+                "refractiveIndex": 1.5
             },
             "lighting": {
                 "color": [1, 1, 1],
                 "intensity": 0.0
+            }
+        },
+        {
+            "type": "box",
+            "name": "wall_back",
+            "collisions": true,
+            "position": [0, 0, -75],
+            "size": [50, 22, 50],
+            "rotation": [0, 0, 0],
+            "material": {
+                "color": [0.5, 0.5, 0.5],
+                "roughness": 0.8,
+                "reflectivity": 0.0,
+                "transparency": 0.5,
+                "refractiveIndex": 1.5
+            },
+            "lighting": {
+                "color": [1, 1, 1],
+                "intensity": 0.0
+            }
+        },
+        {
+            "type": "box",
+            "name": "wall_front",
+            "collisions": true,
+            "position": [0, 0, 75],
+            "size": [50, 22, 50],
+            "rotation": [0, 0, 0],
+            "material": {
+                "color": [0.5, 0.5, 0.5],
+                "roughness": 0.8,
+                "reflectivity": 0.0,
+                "transparency": 0.5,
+                "refractiveIndex": 1.5
+            },
+            "lighting": {
+                "color": [1, 1, 1],
+                "intensity": 0.0
+            }
+        },
+        {
+            "type": "sphere",
+            "name": "ball",
+            "collisions": true,
+            "position": [0, 0, 0],
+            "size": [1, 1, 1],
+            "rotation": [0, 0, 0],
+            "material": {
+                "color": [1, 1, 1],
+                "roughness": 0.5,
+                "reflectivity": 0.5,
+                "transparency": 0.5,
+                "refractiveIndex": 1.5
+            },
+            "lighting": {
+                "color": [0.1, 0.1, 1.0],
+                "intensity": 1.0
+            }
+        },
+        {
+            "type": "box",
+            "name": "paddle_top",
+            "collisions": true,
+            "position": [0, 0, 45],
+            "size": [20, 3, 1],
+            "rotation": [0, 0, 0],
+            "material": {
+                "color": [1, 1, 1],
+                "roughness": 0.5,
+                "reflectivity": 0.5,
+                "transparency": 0.5,
+                "refractiveIndex": 1.5
+            },
+            "lighting": {
+                "color": [1.0, 0.1, 0.1],
+                "intensity": 1.0
+            }
+        },
+        {
+            "type": "box",
+            "name": "paddle_bottom",
+            "collisions": true,
+            "position": [0, 0, -45],
+            "size": [20, 3, 1],
+            "rotation": [0, 0, 0],
+            "material": {
+                "color": [1, 1, 1],
+                "roughness": 0.5,
+                "reflectivity": 0.5,
+                "transparency": 0.5,
+                "refractiveIndex": 1.5
+            },
+            "lighting": {
+                "color": [0.1, 1.0, 0.1],
+                "intensity": 1.0
             }
         }
     ],

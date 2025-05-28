@@ -1,7 +1,8 @@
 import { Camera } from './Camera';
 
 export interface GameObject {
-    type: number;
+    type: string;
+    name: string;
     position: [number, number, number];
     size: [number, number, number];
     rotation: [number, number, number];

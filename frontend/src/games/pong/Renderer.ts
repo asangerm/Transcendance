@@ -105,7 +105,7 @@ export class Renderer {
 
         // Update object data
         objects.forEach((obj, i) => {
-            gl.uniform1i(gl.getUniformLocation(this.program!, `uObjectTypes[${i}]`), obj.type);
+            gl.uniform1i(gl.getUniformLocation(this.program!, `uObjectTypes[${i}]`), obj.type == 'box' ? 1 : 0);
             gl.uniform3fv(gl.getUniformLocation(this.program!, `uObjectPositions[${i}]`), obj.position);
             gl.uniform3fv(gl.getUniformLocation(this.program!, `uObjectSizes[${i}]`), obj.size);
             gl.uniform3fv(gl.getUniformLocation(this.program!, `uObjectColors[${i}]`), obj.material.color);

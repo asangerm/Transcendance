@@ -1,9 +1,6 @@
 #version 300 es
 precision highp float;
 
-// Golf Ball Ray Intersection GLSL Shader Functions
-// For use in fragment shaders or compute shaders
-
 #define SAMPLE_POINTS 4
 #define MAX_LIGHT_RAYS 64 * SAMPLE_POINTS
 
@@ -254,7 +251,7 @@ IntersectionResult intersectBox(vec3 rayOrigin, vec3 rayDirection, int objectInd
 IntersectionResult intersectScene(vec3 rayOrigin, vec3 rayDirection, int excludeObjectIndex) {
     IntersectionResult result;
     result.hit = false;
-    result.distance = -1.0;
+    result.distance = 1000000.0;
     result.point = vec3(0.0);
     result.normal = vec3(0.0);
     result.objectIndex = -1;
@@ -265,6 +262,10 @@ IntersectionResult intersectScene(vec3 rayOrigin, vec3 rayDirection, int exclude
         if (i == excludeObjectIndex) {
             continue;
         }
+
+        // if (uLightIntensities[i] > 0.001) {
+        //     continue;
+        // }
 
         IntersectionResult currentResult;
         
@@ -416,6 +417,45 @@ vec3 calculateLighting(vec3 point, vec3 normal, vec3 viewDir, int objectIndex) {
     return color * 1.5 * direct;
 }
 
+vec3 calculateDirectLighting(vec3 viewDir, float depth) {
+    vec3 color = vec3(0.0);
+
+    for (int i = 0; i < uObjects; i++) {
+        if (uLightIntensities[i] > 0.001) {
+            vec3 lightPos = uObjectPositions[i];
+            vec3 lightColor = uLightColors[i];
+            float lightIntensity = uLightIntensities[i];
+
+            vec3 toLight = lightPos - uCameraPosition;
+            float dist = length(toLight);
+            vec3 lightDir = normalize(toLight);
+
+            vec3 size = uObjectSizes[i];
+            if (uObjectTypes[i] == 0) {  // Sphere
+                float sizeLight = max(size.x, max(size.y, size.z));
+                color += lightColor * lightIntensity * pow(max(0.0, dot(lightDir, viewDir)), dist * dist / (pow(sizeLight, 2.0)));
+            } else {  // Box
+                // Transform light direction to box's local space
+                mat3 rotationMatrix = createRotationMatrix(uObjectRotations[i]);
+                vec3 localLightDir = transpose(rotationMatrix) * lightDir;
+                
+                // Calculate approximate elliptical falloff based on box dimensions
+                float xFactor = (1.0 - abs(localLightDir.x)) * size.x;
+                float yFactor = (1.0 - abs(localLightDir.y)) * size.y;
+                float zFactor = (1.0 - abs(localLightDir.z)) * size.z;
+                float sizeLight = sqrt(xFactor * xFactor + yFactor * yFactor + zFactor * zFactor);
+                
+                // Calculate light contribution
+                float dotProduct = max(0.0, dot(lightDir, viewDir));
+                color += lightColor * lightIntensity * pow(dotProduct, dist * dist / (pow(sizeLight, 2.0)));
+            }
+        }
+    }
+
+    return color;
+}
+
+
 // Example usage in your fragment shader:
 void main() {
     vec2 pixelCoord = gl_FragCoord.xy;
@@ -438,11 +478,15 @@ void main() {
     vec3 color = vec3(0.0);
     vec3 rayOrigin = uCameraPosition;
     float rayEnergy = 1.0;
+
     IntersectionResult result;
 
     int i = 0;
     for (; i < 5 && rayEnergy > 0.01; i++) {
         result = intersectScene(rayOrigin, rayDir, -1);
+        
+        vec3 directLighting = calculateDirectLighting(rayDir, result.distance);
+
         if (result.hit) {
             if (uLightIntensities[result.objectIndex] > 0.001) {
                 color += uLightColors[result.objectIndex] * uLightIntensities[result.objectIndex] * rayEnergy * 10.0;
@@ -453,7 +497,7 @@ void main() {
             vec3 lighting = calculateLighting(result.point, result.normal, viewDir, result.objectIndex);
             
             // Add lighting to the color
-            color += lighting * rayEnergy;
+            color += uObjectColors[result.objectIndex] * (lighting + directLighting) * rayEnergy;
             
             // Handle reflection
             if (uObjectReflectivities[result.objectIndex] > 0.0) {
@@ -464,13 +508,13 @@ void main() {
                 break;
             }
         } else {
-            color += getSkyColor(rayDir) * rayEnergy;
+            color += (getSkyColor(rayDir) + directLighting) * rayEnergy;
             break;
         }
     }
 
     if (i == 0 && !result.hit) {
-        fragColor = vec4(getSkyColor(rayDir), 1.0);
+        fragColor = vec4(getSkyColor(rayDir) + calculateDirectLighting(rayDir, result.distance), 1.0);
     } else {
         fragColor = vec4(color, 1.0);
     }

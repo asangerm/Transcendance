@@ -7,5 +7,7 @@ export default defineConfig({
   },
   css: {
     devSourcemap: true
-  }
+  },
+  assetsInclude: ['**/*.json'],
+  publicDir: 'public'
 }) 

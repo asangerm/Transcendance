@@ -2,6 +2,7 @@ import { Camera } from './Camera';
 import { InputHandler } from './InputHandler';
 import { Renderer } from './Renderer';
 import { Scene } from './Scene';
+import { Ball } from './Ball';
 
 export class PongGame {
     private canvas: HTMLCanvasElement;
@@ -11,6 +12,8 @@ export class PongGame {
     private scene: Scene;
     private inputHandler: InputHandler;
     private animationFrameId: number | null = null;
+    private lastTime: number = 0;
+    private ball: Ball | null = null;
 
     constructor() {
         this.canvas = document.createElement('canvas');
@@ -53,7 +56,15 @@ export class PongGame {
         this.handleResize();
         window.addEventListener('resize', this.handleResize.bind(this));
         await this.renderer.initialize();
-        this.gameLoop();
+        
+        // Initialize ball
+        const ballObject = this.scene.getObjects().find(obj => obj.name === 'ball');
+        if (ballObject) {
+            this.ball = new Ball(ballObject, this.scene);
+        }
+        
+        this.lastTime = performance.now();
+        this.gameLoop(this.lastTime);
     }
 
     unmount(): void {
@@ -74,11 +85,20 @@ export class PongGame {
         }
     }
 
-    private gameLoop(): void {
-        // Update camera based on input
-        const moveSpeed = 0.1;
-        const rotateSpeed = 0.02;
-        this.scene.camera.update(this.inputHandler.getKeys(), moveSpeed, rotateSpeed);
+    private gameLoop(currentTime: number): void {
+        // Calculate delta time in seconds
+        const deltaTime = (currentTime - this.lastTime) / 1000;
+        this.lastTime = currentTime;
+
+        // Update camera based on input with delta time
+        const moveSpeed = 10.0;
+        const rotateSpeed = 3.0;
+        this.scene.camera.update(this.inputHandler.getKeys(), moveSpeed * deltaTime, rotateSpeed * deltaTime);
+
+        // Update ball physics
+        if (this.ball) {
+            this.ball.update(deltaTime);
+        }
 
         // Render the scene
         this.renderer.render(this.scene);

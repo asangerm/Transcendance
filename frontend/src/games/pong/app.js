@@ -392,7 +392,7 @@ class RayTracerApp {
     async init() {
         try {
             await this.renderer.loadShaders();
-            await this.scene.loadFromJSON('/scenes/raytracerScene.json');
+            await this.scene.loadFromJSON('/games/pong/scenes/raytracerScene.json');
             this.animate();
         } catch (error) {
             console.error('Initialization failed:', error);

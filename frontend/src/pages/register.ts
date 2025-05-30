@@ -16,7 +16,7 @@ export function renderRegister() {
                                 id="username"
                                 name="username"
                                 required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                                class="w-full px-4 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                                 placeholder="Choisissez un nom d'utilisateur"
                             >
                         </div>
@@ -31,7 +31,7 @@ export function renderRegister() {
                                 id="email"
                                 name="email"
                                 required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                                class="w-full px-4 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                                 placeholder="Entrez votre email"
                             >
                         </div>
@@ -46,7 +46,7 @@ export function renderRegister() {
                                 id="password"
                                 name="password"
                                 required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                                class="w-full px-4 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                                 placeholder="Créez un mot de passe"
                             >
                         </div>
@@ -61,7 +61,7 @@ export function renderRegister() {
                                 id="confirmPassword"
                                 name="confirmPassword"
                                 required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                                class="w-full px-4 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                                 placeholder="Confirmez votre mot de passe"
                             >
                         </div>

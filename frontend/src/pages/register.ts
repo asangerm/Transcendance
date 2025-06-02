@@ -1,3 +1,6 @@
+import { PasswordStrength } from '../scripts/password-check';
+import { checkPasswordStrength } from '../scripts/password-check';
+
 export function renderRegister() {
     const content = `
         <div class="min-h-screen flex items-center justify-center">
@@ -49,6 +52,9 @@ export function renderRegister() {
                                 class="w-full px-4 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                                 placeholder="Créez un mot de passe"
                             >
+                            <p id="passwordVerif" class="mt-2 text-sm text-muted dark:text-muted-dark">
+                                Veuillez taper un mot de passe
+                            </p>
                         </div>
 
                         <!-- Confirm Password Input -->
@@ -109,7 +115,31 @@ export function renderRegister() {
     const app = document.getElementById('app');
     if (app) {
         app.innerHTML = content;
-        
+        let isPasswOk = false;
+        const passwInput = document.getElementById('password') as HTMLInputElement;
+        if (passwInput) {
+            passwInput.addEventListener('input', () => {
+                let pwdType = checkPasswordStrength(passwInput.value);
+                if (pwdType === PasswordStrength.Short) {
+                    // console.log("short ", passwInput.value);
+                }
+                else if (pwdType === PasswordStrength.Weak) {
+                    // console.log("weak ", passwInput.value);
+                }
+                else if (pwdType === PasswordStrength.Common) {
+                    // console.log("common ", passwInput.value);
+                }
+                else if (pwdType === PasswordStrength.Ok) {
+                    // console.log("ok ", passwInput.value);
+                    isPasswOk = true;
+                }
+                else if (pwdType === PasswordStrength.Strong) {
+                    // console.log("strong ", passwInput.value);
+                    isPasswOk = true;
+                }
+            });
+        }
+
         // Add form submission handler
         const form = document.getElementById('registerForm');
         if (form) {

@@ -2,20 +2,23 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install required OS packages
+# Installer les paquets système nécessaires
 RUN apk add --no-cache openssl openssl-dev sqlite
 
-# Copy app files first
+# Copier uniquement les fichiers package.json et package-lock.json 
+COPY package*.json ./
+
+# Installer les dépendances, y compris bcryptjs
+RUN npm install bcryptjs && npm install
+
+# Copier le reste des fichiers
 COPY . .
 
-# Install dependencies
-RUN npm install
-
-# Make init script executable
+# Rendre le script init.sh exécutable
 RUN chmod +x init.sh
 
-# Expose backend port
+# Exposer le port backend
 EXPOSE 8000
 
-# Start application via init script
+# Lancer l'application via le script d'initialisation
 CMD ["/bin/sh", "./init.sh"]

@@ -417,7 +417,7 @@ vec3 calculateLighting(vec3 point, vec3 normal, vec3 viewDir, int objectIndex) {
     return color * 1.5 * direct;
 }
 
-vec3 calculateDirectLighting(vec3 viewDir, float depth) {
+vec3 calculateDirectLighting(vec3 pos, vec3 viewDir, float depth) {
     vec3 color = vec3(0.0);
 
     for (int i = 0; i < uObjects; i++) {
@@ -426,7 +426,7 @@ vec3 calculateDirectLighting(vec3 viewDir, float depth) {
             vec3 lightColor = uLightColors[i];
             float lightIntensity = uLightIntensities[i];
 
-            vec3 toLight = lightPos - uCameraPosition;
+            vec3 toLight = lightPos - pos;
             float dist = length(toLight);
             vec3 lightDir = normalize(toLight);
 
@@ -485,7 +485,7 @@ void main() {
     for (; i < 5 && rayEnergy > 0.01; i++) {
         result = intersectScene(rayOrigin, rayDir, -1);
         
-        vec3 directLighting = calculateDirectLighting(rayDir, result.distance);
+        vec3 directLighting = calculateDirectLighting(rayOrigin, rayDir, result.distance);
 
         if (result.hit) {
             if (uLightIntensities[result.objectIndex] > 0.001) {
@@ -514,7 +514,7 @@ void main() {
     }
 
     if (i == 0 && !result.hit) {
-        fragColor = vec4(getSkyColor(rayDir) + calculateDirectLighting(rayDir, result.distance), 1.0);
+        fragColor = vec4(getSkyColor(rayDir) + calculateDirectLighting(rayOrigin, rayDir, result.distance), 1.0);
     } else {
         fragColor = vec4(color, 1.0);
     }

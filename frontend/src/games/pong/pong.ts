@@ -3,6 +3,7 @@ import { InputHandler } from './InputHandler';
 import { Renderer } from './Renderer';
 import { Scene } from './Scene';
 import { Ball } from './Ball';
+import { Paddle } from './Paddle';
 
 export class PongGame {
     private canvas: HTMLCanvasElement;
@@ -14,6 +15,8 @@ export class PongGame {
     private animationFrameId: number | null = null;
     private lastTime: number = 0;
     private ball: Ball | null = null;
+    private topPaddle: Paddle | null = null;
+    private bottomPaddle: Paddle | null = null;
 
     constructor() {
         this.canvas = document.createElement('canvas');
@@ -62,6 +65,17 @@ export class PongGame {
         if (ballObject) {
             this.ball = new Ball(ballObject, this.scene);
         }
+
+        // Initialize paddles
+        const topPaddleObject = this.scene.getObjects().find(obj => obj.name === 'paddle_top');
+        const bottomPaddleObject = this.scene.getObjects().find(obj => obj.name === 'paddle_bottom');
+        
+        if (topPaddleObject) {
+            this.topPaddle = new Paddle(topPaddleObject, this.scene, 'o', 'l');
+        }
+        if (bottomPaddleObject) {
+            this.bottomPaddle = new Paddle(bottomPaddleObject, this.scene, 'r', 'f');
+        }
         
         this.lastTime = performance.now();
         this.gameLoop(this.lastTime);
@@ -98,6 +112,14 @@ export class PongGame {
         // Update ball physics
         if (this.ball) {
             this.ball.update(deltaTime);
+        }
+
+        // Update paddles
+        if (this.topPaddle) {
+            this.topPaddle.update(deltaTime, this.inputHandler.getKeys());
+        }
+        if (this.bottomPaddle) {
+            this.bottomPaddle.update(deltaTime, this.inputHandler.getKeys());
         }
 
         // Render the scene

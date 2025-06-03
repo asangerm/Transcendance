@@ -1,10 +1,18 @@
-.PHONY: start stop logs
+# Commande par défaut: lance Docker Compose
+all: up
 
-start:
-	docker compose up --build
+up:
+	docker-compose up --build
 
-stop:
-	docker compose down
+down:
+	docker-compose down
 
-logs:
-	docker compose logs -f 
+restart: down up
+
+clean: down
+	docker-compose down --volumes --remove-orphans --rmi all
+
+fclean: clean
+	docker system prune -af
+
+.PHONY: all up down restart clean fclean

@@ -5,7 +5,7 @@ import { UsersModule } from '../users/users.module';
 import { PrismaModule } from '../prisma.module';
 
 @Module({
-  imports: [UsersModule], // nécessaire pour injecter UsersService
+  imports: [UsersModule, PrismaModule],
   providers: [AuthService],
   controllers: [AuthController]
 })

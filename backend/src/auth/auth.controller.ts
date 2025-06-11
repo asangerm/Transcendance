@@ -8,6 +8,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+     return { message: 'Utilisateur créé en base msg de authcontroller'};
+    // return this.authService.register(createUserDto);
   }
 }

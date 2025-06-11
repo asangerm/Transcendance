@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -15,11 +15,8 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const { passwordHash, ...rest } = user;
-    return {
-      message: 'Utilisateur créé en base',
-      user: rest,
-    };
+    const { password, ...rest } = user;
+    //return { message: 'Utilisateur créé en base msg de authservice', user};
   }
 }
 
